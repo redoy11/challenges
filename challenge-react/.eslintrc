@@ -45,7 +45,8 @@
         "args": "none"
       }
     ],
-    "no-use-before-define": [1, "nofunc"],
+    "no-use-before-define": [0],
+    "@typescript-eslint/no-use-before-define": [1],
     "react/jsx-uses-react": 1,
     "react/jsx-uses-vars": 1,
     "react/react-in-jsx-scope": 1
