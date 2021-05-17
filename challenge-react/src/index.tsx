@@ -4,8 +4,8 @@ import { createStore } from 'redux';
 import { Provider } from 'react-redux';
 import App from './App';
 
-const store = createStore(function (state, action) {
-  const _state =
+const store = createStore(function (state, action: any) {
+  const _state: any =
     state == null
       ? {
           donate: 0,
