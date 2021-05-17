@@ -1,11 +1,26 @@
 {
-  "parser": "babel-eslint",
+  "root": true,
+  "parser": "@typescript-eslint/parser",
   "env": {
     "browser": true,
     "node": true
   },
+  "parserOptions": {
+    "ecmaFeatures": { "jsx": true }
+  },
   "plugins": ["react"],
+  "extends": [
+    "eslint:recommended", 
+    "plugin:@typescript-eslint/eslint-recommended", 
+    "plugin:@typescript-eslint/recommended", 
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended", 
+    "plugin:jsx-a11y/recommended",
+    "prettier",
+    "plugin:prettier/recommended"
+  ],
   "rules": {
+    "prettier/prettier": "error",
     "quotes": [2, "single"],
     "prefer-const": 2,
     "no-const-assign": 2,
@@ -34,5 +49,10 @@
     "react/jsx-uses-react": 1,
     "react/jsx-uses-vars": 1,
     "react/react-in-jsx-scope": 1
+  },
+  "settings": {
+    "react": {
+      "version": "detect" // Tells eslint-plugin-react to automatically detect the version of React to use
+    }
   }
 }
