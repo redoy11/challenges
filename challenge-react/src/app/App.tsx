@@ -1,28 +1,42 @@
 import React from 'react';
-import fetch from 'isomorphic-fetch';
 import { summaryDonations } from '../utils/helpers';
+import { GET, requestService } from '../utils/requests';
 import Card, { CharityItem } from '../components/card/Card';
 
 const App: React.FC = () => {
+  /** manages the list of charities */
   const [charities, setCharities] = React.useState<CharityItem[]>([]);
 
   React.useEffect(() => {
-    fetch('http://localhost:3001/charities')
-      .then(function (resp) {
-        return resp.json();
-      })
-      .then(function (data) {
-        setCharities(data);
-      });
+    /** method to fetch existing charities from server */
+    const fetchCharties = async () => {
+      try {
+        const charities = await requestService(
+          GET,
+          'http://localhost:3001/charities'
+        );
+        setCharities(charities);
+      } catch (Exception) {
+        console.error(Exception);
+      }
+    };
 
-    fetch('http://localhost:3001/payments')
-      .then(function (resp) {
-        return resp.json();
-      })
-      .then(function (data) {
-        /** TODO: update donation count in store */
-        summaryDonations(data.map((item) => item.amount));
-      });
+    /** method to fetch existing charities from server */
+    const fetchPayments = async () => {
+      try {
+        const payments: any = await requestService(
+          GET,
+          'http://localhost:3001/payments'
+        );
+        summaryDonations(payments.map((item) => item.amount));
+      } catch (Exception) {
+        console.error(Exception);
+      }
+    };
+
+    /** fetch existing data from server on initial load */
+    fetchCharties();
+    fetchPayments();
   }, []);
 
   const style = {
