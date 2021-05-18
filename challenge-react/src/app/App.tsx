@@ -2,6 +2,10 @@ import React from 'react';
 import { summaryDonations } from '../utils/helpers';
 import { GET, requestService } from '../utils/requests';
 import Card, { CharityItem } from '../components/card/Card';
+import {
+  SERVER_CHARITIES_ENDPOINT,
+  SERVER_PAYMENTS_ENDPOINT,
+} from '../configs/endpoints';
 
 const App: React.FC = () => {
   /** manages the list of charities */
@@ -11,10 +15,7 @@ const App: React.FC = () => {
     /** method to fetch existing charities from server */
     const fetchCharties = async () => {
       try {
-        const charities = await requestService(
-          GET,
-          'http://localhost:3001/charities'
-        );
+        const charities = await requestService(GET, SERVER_CHARITIES_ENDPOINT);
         setCharities(charities);
       } catch (Exception) {
         console.error(Exception);
@@ -26,7 +27,7 @@ const App: React.FC = () => {
       try {
         const payments: any = await requestService(
           GET,
-          'http://localhost:3001/payments'
+          SERVER_PAYMENTS_ENDPOINT
         );
         summaryDonations(payments.map((item) => item.amount));
       } catch (Exception) {
