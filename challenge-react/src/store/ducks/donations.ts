@@ -93,7 +93,7 @@ export default function reducer(
  * @returns {number} - the existing donation in store
  */
 export function getDonationCount(state: Partial<Store>): number {
-  return state[reducerName].donation;
+  return state[reducerName].donate;
 }
 
 /**
