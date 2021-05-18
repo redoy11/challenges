@@ -4,6 +4,10 @@ import {
   INITIAL_SELECTED_DONATION_AMOUNT,
 } from '../../configs/constants';
 import styled from 'styled-components';
+import { POST, requestService } from '../../utils/requests';
+import { SERVER_PAYMENTS_ENDPOINT } from '../../configs/endpoints';
+import { connect } from 'react-redux';
+import { updateTotalDonateAction } from '../../store/ducks/donations';
 
 /** interface to describe the Charity item object */
 export interface CharityItem {
@@ -24,12 +28,13 @@ const CardContainer = styled.div`
 /** interface to describe the Card props */
 interface CardProps {
   item: CharityItem;
+  updateTotalDonateActionCreator: typeof updateTotalDonateAction;
 }
 
 /** component */
 
 const Card: React.FC<CardProps> = (props: CardProps) => {
-  const { item } = props;
+  const { item, updateTotalDonateActionCreator } = props;
 
   /** states */
 
@@ -40,8 +45,17 @@ const Card: React.FC<CardProps> = (props: CardProps) => {
 
   /** handlers */
 
-  const handlePay = () => {
-    /** TODO: write the method */
+  const handlePay = async () => {
+    try {
+      await requestService(POST, SERVER_PAYMENTS_ENDPOINT, {
+        charitiesId: item.id,
+        amount: selectedAmount,
+        currency: item.currency,
+      });
+      updateTotalDonateActionCreator(selectedAmount);
+    } catch (exception) {
+      console.error(exception);
+    }
   };
 
   const payments = DEFAULT_DONATION_AMOUNTS.map((amount, index) => (
@@ -67,4 +81,14 @@ const Card: React.FC<CardProps> = (props: CardProps) => {
   );
 };
 
-export default Card;
+/** connect the component to the store */
+
+/** map props to actions */
+const mapDispatchToProps = {
+  updateTotalDonateActionCreator: updateTotalDonateAction,
+};
+
+/** connect Card to the redux store */
+const ConnectedCard = connect(null, mapDispatchToProps)(Card);
+
+export default ConnectedCard;
