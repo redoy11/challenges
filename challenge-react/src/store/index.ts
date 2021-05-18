@@ -1,4 +1,4 @@
-import { createStore } from 'redux';
+import { combineReducers, createStore } from 'redux';
 import donation, { reducerName as donationReducer } from './ducks/donations';
 
 /** reducers */
@@ -13,6 +13,6 @@ defaultReducers[donationReducer] = donation;
 /** store */
 
 /** create the redux store */
-const store = createStore(defaultReducers);
+const store = createStore(combineReducers(defaultReducers), {});
 
 export default store;
