@@ -6,8 +6,22 @@ import {
   SERVER_CHARITIES_ENDPOINT,
   SERVER_PAYMENTS_ENDPOINT,
 } from '../configs/endpoints';
+import {
+  getDonationCount,
+  updateTotalDonateAction,
+} from '../store/ducks/donations';
+import { Store } from 'redux';
+import { connect } from 'react-redux';
 
-const App: React.FC = () => {
+/** interface to describe App props */
+interface AppProps {
+  total: number;
+  updateTotalDonateActionCreator: typeof updateTotalDonateAction;
+}
+
+const App: React.FC<AppProps> = (props: AppProps) => {
+  const { total, updateTotalDonateActionCreator } = props;
+
   /** manages the list of charities */
   const [charities, setCharities] = React.useState<CharityItem[]>([]);
 
@@ -29,7 +43,9 @@ const App: React.FC = () => {
           GET,
           SERVER_PAYMENTS_ENDPOINT
         );
-        summaryDonations(payments.map((item) => item.amount));
+        updateTotalDonateActionCreator(
+          summaryDonations(payments.map((item) => item.amount))
+        );
       } catch (Exception) {
         console.error(Exception);
       }
@@ -48,14 +64,12 @@ const App: React.FC = () => {
     textAlign: 'center',
   };
 
-  /** Todo: connect with the store */
-  const donate = 0;
   const message = '';
 
   return (
     <div>
       <h1>Tamboon React</h1>
-      <p>All donations: {donate}</p>
+      <p>All donations: {total}</p>
       <p style={style}>{message}</p>
       {charities.map((charity: CharityItem, index: number) => (
         <Card key={index} item={charity} />
@@ -64,4 +78,27 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+/** connect the component to the store */
+
+/** Interface to describe props from mapStateToProps */
+interface DispatchedStateProps {
+  total: number;
+}
+
+/** Map props to state  */
+const mapStateToProps = (state: Partial<Store>): DispatchedStateProps => {
+  const result = {
+    total: getDonationCount(state),
+  };
+  return result;
+};
+
+/** map props to actions */
+const mapDispatchToProps = {
+  updateTotalDonateActionCreator: updateTotalDonateAction,
+};
+
+/** connect App to the redux store */
+const ConnectedApp = connect(mapStateToProps, mapDispatchToProps)(App);
+
+export default ConnectedApp;
