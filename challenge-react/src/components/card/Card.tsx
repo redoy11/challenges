@@ -1,9 +1,18 @@
 import React from 'react';
-import { INITIAL_SELECTED_DONATION_AMOUNT } from '../../configs/constants';
+import {
+  ERROR_MESSAGE,
+  INITIAL_SELECTED_DONATION_AMOUNT,
+  SUCCESS_MESSAGE,
+} from '../../configs/constants';
 import { POST, requestService } from '../../utils/requests';
 import { SERVER_PAYMENTS_ENDPOINT } from '../../configs/endpoints';
 import { connect } from 'react-redux';
-import { updateTotalDonateAction } from '../../store/ducks/donations';
+import {
+  ERROR_TYPE,
+  SUCCESS_TYPE,
+  updateMessageAction,
+  updateTotalDonateAction,
+} from '../../store/ducks/donations';
 import { CancelButton, CardContainer } from './styles';
 import CardDisplay from '../cardDisplay/CardDisplay';
 import CardPayment from '../cardPayment/CardPayment';
@@ -21,13 +30,15 @@ export interface CharityItem {
 /** interface to describe the Card props */
 interface CardProps {
   item: CharityItem;
+  updateMessageActionCreator: typeof updateMessageAction;
   updateTotalDonateActionCreator: typeof updateTotalDonateAction;
 }
 
 /** component */
 
 const Card: React.FC<CardProps> = (props: CardProps) => {
-  const { item, updateTotalDonateActionCreator } = props;
+  const { item, updateTotalDonateActionCreator, updateMessageActionCreator } =
+    props;
 
   /** states */
 
@@ -53,7 +64,11 @@ const Card: React.FC<CardProps> = (props: CardProps) => {
       updateTotalDonateActionCreator(selectedAmount);
       setIsPaymentVisible(false);
       setSelectedAmount(INITIAL_SELECTED_DONATION_AMOUNT);
+      updateMessageActionCreator(SUCCESS_MESSAGE, SUCCESS_TYPE);
+      setTimeout(() => updateMessageActionCreator('', SUCCESS_TYPE), 1000);
     } catch (exception) {
+      updateMessageActionCreator(ERROR_MESSAGE, ERROR_TYPE);
+      setTimeout(() => updateMessageActionCreator('', ERROR_TYPE), 1000);
       console.error(exception);
     }
   };
@@ -104,6 +119,7 @@ const Card: React.FC<CardProps> = (props: CardProps) => {
 /** map props to actions */
 const mapDispatchToProps = {
   updateTotalDonateActionCreator: updateTotalDonateAction,
+  updateMessageActionCreator: updateMessageAction,
 };
 
 /** connect Card to the redux store */
