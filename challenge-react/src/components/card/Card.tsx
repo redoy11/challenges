@@ -1,13 +1,12 @@
 import React from 'react';
-import {
-  DEFAULT_DONATION_AMOUNTS,
-  INITIAL_SELECTED_DONATION_AMOUNT,
-} from '../../configs/constants';
-import styled from 'styled-components';
+import { INITIAL_SELECTED_DONATION_AMOUNT } from '../../configs/constants';
 import { POST, requestService } from '../../utils/requests';
 import { SERVER_PAYMENTS_ENDPOINT } from '../../configs/endpoints';
 import { connect } from 'react-redux';
 import { updateTotalDonateAction } from '../../store/ducks/donations';
+import { CancelButton, CardContainer } from './styles';
+import CardDisplay from '../cardDisplay/CardDisplay';
+import CardPayment from '../cardPayment/CardPayment';
 
 /** interface to describe the Charity item object */
 export interface CharityItem {
@@ -16,12 +15,6 @@ export interface CharityItem {
   image: string;
   currency: string;
 }
-
-/** styles */
-const CardContainer = styled.div`
-  margin: 10px;
-  border: 1px solid #ccc;
-`;
 
 /** interfaces */
 
@@ -43,8 +36,13 @@ const Card: React.FC<CardProps> = (props: CardProps) => {
     INITIAL_SELECTED_DONATION_AMOUNT
   );
 
+  /** manages where the payment container is visible or not */
+  const [isPaymentVisible, setIsPaymentVisible] =
+    React.useState<boolean>(false);
+
   /** handlers */
 
+  /** commits the payment to the server */
   const handlePay = async () => {
     try {
       await requestService(POST, SERVER_PAYMENTS_ENDPOINT, {
@@ -53,30 +51,50 @@ const Card: React.FC<CardProps> = (props: CardProps) => {
         currency: item.currency,
       });
       updateTotalDonateActionCreator(selectedAmount);
+      setIsPaymentVisible(false);
+      setSelectedAmount(INITIAL_SELECTED_DONATION_AMOUNT);
     } catch (exception) {
       console.error(exception);
     }
   };
 
-  const payments = DEFAULT_DONATION_AMOUNTS.map((amount, index) => (
-    <label key={index}>
-      <input
-        type="radio"
-        name={item.id}
-        checked={amount === selectedAmount}
-        onChange={function () {
-          setSelectedAmount(amount);
-        }}
-      />
-      {amount}
-    </label>
-  ));
+  /** displays the payment container */
+  const displayPaymentHandler = () => {
+    setIsPaymentVisible(true);
+  };
+
+  /**
+   * sets the requested amount as selected amount
+   * @param requestedAmount - the requested amount to set
+   */
+  const onChangeHandler = (requestedAmount: number) =>
+    setSelectedAmount(requestedAmount);
+
+  /** hides the payment container */
+  const hidePaymentDisplay = () => {
+    setIsPaymentVisible(false);
+    setSelectedAmount(INITIAL_SELECTED_DONATION_AMOUNT);
+  };
 
   return (
     <CardContainer>
-      <p>{item.name}</p>
-      {payments}
-      <button onClick={handlePay}>Pay</button>
+      {isPaymentVisible && (
+        <React.Fragment>
+          <CancelButton onClick={hidePaymentDisplay}>x</CancelButton>
+          <CardPayment
+            id={item.id}
+            currency={item.currency}
+            selected={selectedAmount}
+            onChangeHandler={onChangeHandler}
+            confirmHandler={handlePay}
+          />
+        </React.Fragment>
+      )}
+      <CardDisplay
+        name={item.name}
+        image={item.image}
+        donateHandler={displayPaymentHandler}
+      />
     </CardContainer>
   );
 };
