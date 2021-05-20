@@ -7,21 +7,27 @@ import {
   SERVER_PAYMENTS_ENDPOINT,
 } from '../configs/endpoints';
 import {
+  ERROR_TYPE,
   getDonationCount,
+  getDonationMessage,
+  SUCCESS_TYPE,
   updateTotalDonateAction,
 } from '../store/ducks/donations';
 import { Store } from 'redux';
 import { connect } from 'react-redux';
 import { AppBody, AppHeader } from './styles';
+import Message from '../components/message/Message';
 
 /** interface to describe App props */
 interface AppProps {
   total: number;
+  message: string;
+  messageType: SUCCESS_TYPE | ERROR_TYPE;
   updateTotalDonateActionCreator: typeof updateTotalDonateAction;
 }
 
 const App: React.FC<AppProps> = (props: AppProps) => {
-  const { total, updateTotalDonateActionCreator } = props;
+  const { total, message, messageType, updateTotalDonateActionCreator } = props;
 
   /** manages the list of charities */
   const [charities, setCharities] = React.useState<CharityItem[]>([]);
@@ -40,12 +46,10 @@ const App: React.FC<AppProps> = (props: AppProps) => {
     /** method to fetch existing charities from server */
     const fetchPayments = async () => {
       try {
-        const payments: any = await requestService(
-          GET,
-          SERVER_PAYMENTS_ENDPOINT
-        );
+        const payments = await requestService(GET, SERVER_PAYMENTS_ENDPOINT);
         updateTotalDonateActionCreator(
-          summaryDonations(payments.map((item) => item.amount))
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          summaryDonations((payments as any).map((item) => item.amount))
         );
       } catch (Exception) {
         console.error(Exception);
@@ -55,10 +59,12 @@ const App: React.FC<AppProps> = (props: AppProps) => {
     /** fetch existing data from server on initial load */
     fetchCharties();
     fetchPayments();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <div>
+      <Message type={messageType} message={message} />
       <AppHeader>
         <h1>Tamboon React</h1>
         <p>
@@ -79,12 +85,17 @@ const App: React.FC<AppProps> = (props: AppProps) => {
 /** Interface to describe props from mapStateToProps */
 interface DispatchedStateProps {
   total: number;
+  message: string;
+  messageType: SUCCESS_TYPE | ERROR_TYPE;
 }
 
 /** Map props to state  */
 const mapStateToProps = (state: Partial<Store>): DispatchedStateProps => {
+  const msgObj = getDonationMessage(state);
   const result = {
     total: getDonationCount(state),
+    message: msgObj.description,
+    messageType: msgObj.type,
   };
   return result;
 };
