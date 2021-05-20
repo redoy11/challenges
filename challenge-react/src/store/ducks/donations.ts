@@ -1,9 +1,23 @@
 import { AnyAction, Store } from 'redux';
 
+/** success message type */
+export const SUCCESS_TYPE = 'success';
+export type SUCCESS_TYPE = typeof SUCCESS_TYPE;
+
+/** error message type */
+export const ERROR_TYPE = 'error';
+export type ERROR_TYPE = typeof ERROR_TYPE;
+
+/** interface to describe Message object */
+export interface MessageObj {
+  type: SUCCESS_TYPE | ERROR_TYPE;
+  description: string;
+}
+
 /** interface to describe the donation state */
 export interface DonationState {
   donate: number;
-  message: string;
+  message: MessageObj;
 }
 
 /** The reducer name */
@@ -28,6 +42,7 @@ export interface UpdateTotalDonateAction extends AnyAction {
 /** interface for UPDATE_MESSAGE action */
 export interface UpdateMessageAction extends AnyAction {
   message: string;
+  messageType: SUCCESS_TYPE | ERROR_TYPE;
   type: typeof UPDATE_MESSAGE;
 }
 
@@ -52,19 +67,27 @@ export const updateTotalDonateAction = (
 });
 
 /**
- * sets the requested message on store
+ * sets the requested message and type on store
  * @param message - the message to be set
+ * @param messageType - the message type to be set
  * @returns {UpdateMessageAction} - an action to set the message to the store
  */
-export const updateMessageAction = (message: string): UpdateMessageAction => ({
+export const updateMessageAction = (
+  message: string,
+  messageType: SUCCESS_TYPE | ERROR_TYPE
+): UpdateMessageAction => ({
   message,
+  messageType,
   type: UPDATE_MESSAGE,
 });
 
 /** the reducer */
 
 /** initial Donation state */
-const initialState: DonationState = { donate: 0, message: '' };
+const initialState: DonationState = {
+  donate: 0,
+  message: { type: SUCCESS_TYPE, description: '' },
+};
 
 /** the donation reducer function */
 export default function reducer(
@@ -78,7 +101,7 @@ export default function reducer(
       });
     case UPDATE_MESSAGE:
       return Object.assign({}, state, {
-        message: action.message,
+        message: { description: action.message, type: action.messageType },
       });
     default:
       return state;
@@ -97,10 +120,10 @@ export function getDonationCount(state: Partial<Store>): number {
 }
 
 /**
- * returns the existing message
+ * returns the existing message object
  * @param {Partial<Store>} state - the existing store state
- * @returns {string} - the existing message in store
+ * @returns {MessageObj} - the existing message in store
  */
-export function getDonationMessage(state: Partial<Store>): string {
+export function getDonationMessage(state: Partial<Store>): MessageObj {
   return state[reducerName].message;
 }
