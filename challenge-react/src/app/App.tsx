@@ -12,6 +12,7 @@ import {
 } from '../store/ducks/donations';
 import { Store } from 'redux';
 import { connect } from 'react-redux';
+import { AppBody, AppHeader } from './styles';
 
 /** interface to describe App props */
 interface AppProps {
@@ -56,24 +57,19 @@ const App: React.FC<AppProps> = (props: AppProps) => {
     fetchPayments();
   }, []);
 
-  const style = {
-    color: 'red',
-    margin: '1em 0',
-    fontWeight: 'bold',
-    fontSize: '16px',
-    textAlign: 'center',
-  };
-
-  const message = '';
-
   return (
     <div>
-      <h1>Tamboon React</h1>
-      <p>All donations: {total}</p>
-      <p style={style}>{message}</p>
-      {charities.map((charity: CharityItem, index: number) => (
-        <Card key={index} item={charity} />
-      ))}
+      <AppHeader>
+        <h1>Tamboon React</h1>
+        <p>
+          Total raised (THB): <span> {total}</span>
+        </p>
+      </AppHeader>
+      <AppBody>
+        {charities.map((charity: CharityItem, index: number) => (
+          <Card key={index} item={charity} />
+        ))}
+      </AppBody>
     </div>
   );
 };
