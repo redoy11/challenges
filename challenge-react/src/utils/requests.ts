@@ -1,5 +1,3 @@
-import fetch from 'isomorphic-fetch';
-
 /** type of requests */
 
 /** get method type */
