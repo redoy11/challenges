@@ -31,6 +31,9 @@ export const UPDATE_TOTAL_DONATE = 'opn/reducer/donation/UPDATE_TOTAL_DONATE';
 /** UPDATE_MESSAGE action types */
 export const UPDATE_MESSAGE = 'opn/reducer/donation/UPDATE_MESSAGE';
 
+/** RESET_DONATION action types */
+export const RESET_DONATION = 'opn/reducer/donation/RESET_DONATION';
+
 /** action creators interfaces */
 
 /** interface for UPDATE_TOTAL_DONATE action */
@@ -46,10 +49,16 @@ export interface UpdateMessageAction extends AnyAction {
   type: typeof UPDATE_MESSAGE;
 }
 
+/** interface for RESET_DONATION action */
+export interface ResetDonationAction extends AnyAction {
+  type: typeof RESET_DONATION;
+}
+
 /** Create type for donation reducer actions */
 export type DonationActionTypes =
   | UpdateTotalDonateAction
   | UpdateMessageAction
+  | ResetDonationAction
   | AnyAction;
 
 /** action creators */
@@ -81,6 +90,14 @@ export const updateMessageAction = (
   type: UPDATE_MESSAGE,
 });
 
+/**
+ * resets the store to default state
+ * @returns {ResetDonationAction} - an action to reset store to default state
+ */
+export const resetDonationAction = (): ResetDonationAction => ({
+  type: RESET_DONATION,
+});
+
 /** the reducer */
 
 /** initial Donation state */
@@ -103,6 +120,8 @@ export default function reducer(
       return Object.assign({}, state, {
         message: { description: action.message, type: action.messageType },
       });
+    case RESET_DONATION:
+      return Object.assign({}, initialState);
     default:
       return state;
   }
