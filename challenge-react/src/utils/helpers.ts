@@ -4,4 +4,4 @@
  * @returns {number} - the sum of donations
  */
 export const summaryDonations = (donations: number[]): number =>
-  donations.reduce((accumulator, value) => accumulator + value);
+  donations.reduce((accumulator, value) => accumulator + value, 0);
