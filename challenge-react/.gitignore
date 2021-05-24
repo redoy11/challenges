@@ -10,3 +10,6 @@ build
 
 # editor
 .vscode
+
+# coverage folder
+coverage
